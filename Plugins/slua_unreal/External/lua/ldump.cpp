@@ -174,6 +174,7 @@ static void DumpFunction (const Proto *f, TString *psource, DumpState *D) {
   DumpByte(f->numparams, D);
   DumpByte(f->is_vararg, D);
   DumpByte(f->maxstacksize, D);
+  DumpVar(f->trace_id, D);
   DumpCode(f, D);
   DumpConstants(f, D);
   DumpUpvalues(f, D);

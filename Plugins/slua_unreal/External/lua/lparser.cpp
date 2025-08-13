@@ -39,6 +39,7 @@ namespace NS_SLUA {
    can use pointer equality for string equality */
 #define eqstr(a,b)	((a) == (b))
 
+static uint16_t trace_id_counter = 1;
 
 /*
 ** nodes for block list (list of active blocks)
@@ -506,6 +507,7 @@ static Proto *addprototype (LexState *ls) {
       f->p[oldsize++] = NULL;
   }
   f->p[fs->np++] = clp = luaF_newproto(L);
+  clp->trace_id = trace_id_counter++;
   luaC_objbarrier(L, f, clp);
   return clp;
 }
@@ -1632,6 +1634,7 @@ LClosure *luaY_parser (lua_State *L, ZIO *z, Mbuffer *buff,
   sethvalue(L, L->top, lexstate.h);  /* anchor it */
   luaD_inctop(L);
   funcstate.f = cl->p = luaF_newproto(L);
+  funcstate.f->trace_id = trace_id_counter++;
   funcstate.f->source = luaS_new(L, name);  /* create and anchor TString */
   lua_assert(iswhite(funcstate.f));  /* do not need barrier here */
   lexstate.buff = buff;

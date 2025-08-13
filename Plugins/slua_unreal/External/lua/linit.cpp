@@ -32,6 +32,7 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
+#include "trace.h"
 namespace NS_SLUA {
 
 /*
@@ -58,6 +59,7 @@ static const luaL_Reg loadedlibs[] = {
 
 LUALIB_API void luaL_openlibs (lua_State *L) {
   const luaL_Reg *lib;
+  trace_init();
   /* "require" functions from 'loadedlibs' and set results to global table */
   for (lib = loadedlibs; lib->func; lib++) {
     luaL_requiref(L, lib->name, lib->func, 1);

@@ -22,6 +22,15 @@
 #include "lstate.h"
 #include "lundump.h"
 
+/* Optional trace hooks for symbol output when building luac separately */
+#ifndef LUAC_TRACE
+#define LUAC_TRACE 0
+#endif
+#if LUAC_TRACE
+extern void slua_trace_symbol_init(const char* filename);
+extern void slua_trace_symbol_record(const void* f);
+#endif
+
 static void PrintFunction(const Proto* f, int full);
 #define luaU_print	PrintFunction
 
@@ -175,6 +184,10 @@ static int pmain(lua_State* L)
   if (luaL_loadfile(L,filename)!=LUA_OK) fatal(lua_tostring(L,-1));
  }
  f=combine(L,argc);
+ #if LUAC_TRACE
+ slua_trace_symbol_init("symbols.txt");
+ slua_trace_symbol_record(f);
+ #endif
  if (listing) luaU_print(f,listing>1);
  if (dumping)
  {

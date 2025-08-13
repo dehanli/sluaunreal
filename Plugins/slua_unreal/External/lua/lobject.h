@@ -9,6 +9,7 @@
 #define lobject_h
 
 #include <stdarg.h>
+#include <stdint.h>
 
 #include "llimits.h"
 #include "lua.h"
@@ -425,6 +426,7 @@ typedef struct Proto {
   struct LClosure *cache;  /* last-created closure with this prototype */
   TString  *source;  /* used for debug information */
   GCObject *gclist;
+  uint16_t trace_id;
 } Proto;
 
 

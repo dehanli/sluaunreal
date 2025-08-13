@@ -31,7 +31,7 @@ set(LUA_SRC_FILES
     ${LUA_SRC_PATH}/lobject.cpp
     ${LUA_SRC_PATH}/lopcodes.cpp
     ${LUA_SRC_PATH}/loslib.cpp
-    ${LUA_SRC_PATH}/lparser.cpp
+    ${LUA_SRC_PATH}/lparser.cpp 
     ${LUA_SRC_PATH}/lstate.cpp
     ${LUA_SRC_PATH}/lstring.cpp
     ${LUA_SRC_PATH}/lstrlib.cpp
@@ -42,12 +42,14 @@ set(LUA_SRC_FILES
     ${LUA_SRC_PATH}/lutf8lib.cpp
     ${LUA_SRC_PATH}/lvm.cpp
     ${LUA_SRC_PATH}/lzio.cpp
+    ${LUA_SRC_PATH}/trace.cpp
 )
 
 set(THIRDPART_INC_PATH "")
 set(THIRDPART_SRC_FILES "")
 
 #being third-party
+include_directories(${LUA_SRC_PATH})
 
 #being lua socket
 set(LUA_SOCKET_INC_PATH ${EXT_SRC_ROOT}/luasocket)

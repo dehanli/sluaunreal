@@ -207,6 +207,7 @@ static void LoadFunction (LoadState *S, Proto *f, TString *psource) {
   f->numparams = LoadByte(S);
   f->is_vararg = LoadByte(S);
   f->maxstacksize = LoadByte(S);
+  LoadVar(S, f->trace_id);
   LoadCode(S, f);
   LoadConstants(S, f);
   LoadUpvalues(S, f);

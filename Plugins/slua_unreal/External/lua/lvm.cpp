@@ -29,8 +29,25 @@
 #include "ltable.h"
 #include "ltm.h"
 
+#include "trace.h" 
 namespace NS_SLUA {
 
+/* Trace Lua closure call */
+#define trace_LClosure_call(ra) do { \
+	if (ttisLclosure(ra)) { \
+		LClosure *cl = clLvalue(ra);  \
+		trace_record(cl->p, TRACE_EVENT_CALL); \
+	} \
+} while (0)
+
+/* Trace Lua closure return */
+#define trace_LClosure_return() do { \
+	if (ttisLclosure(ci->func)) { \
+		LClosure *cl = clLvalue(ci->func); \
+		trace_record(cl->p, TRACE_EVENT_RETURN); \
+	} \
+} while (0)
+ 
 /* limit for table tag-method chains (to avoid loops) */
 #define MAXTAGLOOP	2000
 
@@ -1130,6 +1147,7 @@ void luaV_execute (lua_State *L) {
         vmbreak;
       }
       vmcase(OP_CALL) {
+        trace_LClosure_call(ra);
         int b = GETARG_B(i);
         int nresults = GETARG_C(i) - 1;
         if (b != 0) L->top = ra+b;  /* else previous instruction set top */
@@ -1145,6 +1163,7 @@ void luaV_execute (lua_State *L) {
         vmbreak;
       }
       vmcase(OP_TAILCALL) {
+        trace_LClosure_call(ra);
         int b = GETARG_B(i);
         if (b != 0) L->top = ra+b;  /* else previous instruction set top */
         lua_assert(GETARG_C(i) - 1 == LUA_MULTRET);
@@ -1176,6 +1195,7 @@ void luaV_execute (lua_State *L) {
         vmbreak;
       }
       vmcase(OP_RETURN) {
+        trace_LClosure_return();
         int b = GETARG_B(i);
         if (cl->p->sizep > 0) luaF_close(L, base);
         b = luaD_poscall(L, ci, ra, (b != 0 ? b - 1 : cast_int(L->top - ra)));
