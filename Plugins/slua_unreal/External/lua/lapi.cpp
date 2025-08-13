@@ -26,6 +26,7 @@
 #include "ltm.h"
 #include "lundump.h"
 #include "lvm.h"
+#include "trace.h"
 
 namespace NS_SLUA {
 
@@ -996,6 +997,7 @@ LUA_API int lua_load (lua_State *L, lua_Reader reader, void *data,
   status = luaD_protectedparser(L, &z, chunkname, mode);
   if (status == LUA_OK) {  /* no errors? */
     LClosure *f = clLvalue(L->top - 1);  /* get newly created function */
+    symbol_record(f->p);
     if (f->nupvalues >= 1) {  /* does it have an upvalue? */
       /* get global table from registry */
       Table *reg = hvalue(&G(L)->l_registry);
