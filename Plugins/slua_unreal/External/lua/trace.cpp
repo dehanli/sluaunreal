@@ -157,12 +157,4 @@ void trace_record(const Proto* p, uint8_t event) {
 
 } // end NS_SLUA
 
-// C-linkage wrappers for use from C code (e.g., luac.c)
-extern "C" void slua_trace_symbol_init(const char* filename) {
-	NS_SLUA::symbol_init(filename);
-}
-
-extern "C" void slua_trace_symbol_record(const void* f) {
-	const NS_SLUA::Proto* pf = reinterpret_cast<const NS_SLUA::Proto*>(f);
-	NS_SLUA::symbol_record(pf);
-} 
+ 
