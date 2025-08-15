@@ -371,12 +371,13 @@ static int moveresults (lua_State *L, const TValue *firstResult, StkId res,
 int luaD_poscall (lua_State *L, CallInfo *ci, StkId firstResult, int nres) {
   StkId res;
   int wanted = ci->nresults;
-  /* Trace Lua closure return here to catch all return paths, including
-     those that may bypass OP_RETURN instrumentation (e.g., empty return). */
+  
+  /* Trace Lua closure return */
   if (isLua(ci)) {
     LClosure *cl = clLvalue(ci->func);
     trace_record(cl->p, TRACE_EVENT_RETURN);
   }
+  
   if (L->hookmask & (LUA_MASKRET | LUA_MASKLINE)) {
     if (L->hookmask & LUA_MASKRET) {
       ptrdiff_t fr = savestack(L, firstResult);  /* hook may change stack */
