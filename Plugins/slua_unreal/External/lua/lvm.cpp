@@ -1185,7 +1185,6 @@ void luaV_execute (lua_State *L) {
         vmbreak;
       }
       vmcase(OP_RETURN) {
-        trace_LClosure_return();
         int b = GETARG_B(i);
         if (cl->p->sizep > 0) luaF_close(L, base);
         b = luaD_poscall(L, ci, ra, (b != 0 ? b - 1 : cast_int(L->top - ra)));
