@@ -32,14 +32,6 @@
 #include "trace.h" 
 namespace NS_SLUA {
 
-/* Trace Lua closure call */
-#define trace_LClosure_call(ra) do { \
-	if (ttisLclosure(ra)) { \
-		LClosure *cl = clLvalue(ra);  \
-		trace_record(cl->p, TRACE_EVENT_CALL); \
-	} \
-} while (0)
-
 /* Trace Lua closure return */
 #define trace_LClosure_return() do { \
 	if (ttisLclosure(ci->func)) { \
@@ -1147,7 +1139,6 @@ void luaV_execute (lua_State *L) {
         vmbreak;
       }
       vmcase(OP_CALL) {
-        trace_LClosure_call(ra);
         int b = GETARG_B(i);
         int nresults = GETARG_C(i) - 1;
         if (b != 0) L->top = ra+b;  /* else previous instruction set top */
@@ -1163,7 +1154,6 @@ void luaV_execute (lua_State *L) {
         vmbreak;
       }
       vmcase(OP_TAILCALL) {
-        trace_LClosure_call(ra);
         int b = GETARG_B(i);
         if (b != 0) L->top = ra+b;  /* else previous instruction set top */
         lua_assert(GETARG_C(i) - 1 == LUA_MULTRET);

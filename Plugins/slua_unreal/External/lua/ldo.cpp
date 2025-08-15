@@ -30,6 +30,7 @@
 #include "lundump.h"
 #include "lvm.h"
 #include "lzio.h"
+#include "trace.h"
 
 #define errorstatus(s)	((s) > LUA_YIELD)
 /*
@@ -434,6 +435,7 @@ int luaD_precall (lua_State *L, StkId func, int nresults) {
     case LUA_TLCL: {  /* Lua function: prepare its call */
       StkId base;
       Proto *p = clLvalue(func)->p;
+      trace_record(p, TRACE_EVENT_CALL);
       int n = cast_int(L->top - func) - 1;  /* number of real arguments */
       int fsize = p->maxstacksize;  /* frame size */
       checkstackp(L, fsize, func);
