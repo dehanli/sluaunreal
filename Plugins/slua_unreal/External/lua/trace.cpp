@@ -23,15 +23,11 @@ static FILE*      trace_file   = NULL;
 static int        symbol_atexit_registered = 0;
 static int        trace_atexit_registered = 0;
 
-
-
 // Helper: open a file in current working directory
 static FILE* fopen_trace_output(const char* name, const char* mode) {
 	return fopen(name, mode);
 }
 
-
-// Initialize symbol recording
 void symbol_init(const char* filename) {
 	// Close existing file if any
 	if (symbol_file) {
@@ -74,7 +70,6 @@ void symbol_record(const Proto* f) {
 	}
 }
 
-// Opens trace.bin and registers cleanup at exit
 void trace_init(void) {
 	// Close existing file if any
 	if (trace_file) {
@@ -100,7 +95,10 @@ void trace_init(void) {
 // Flushes buffer to file
 static void flush_buffer(void) {
 	if (buffer_pos == 0 || !trace_file) return;
-	fwrite(trace_buffer, sizeof(TraceEntry), buffer_pos, trace_file);
+	// Write contiguous 2-byte entries
+	for (size_t i = 0; i < buffer_pos; ++i) {
+		fwrite(trace_buffer[i].bytes, sizeof(trace_buffer[i].bytes), 1, trace_file);
+	}
 	fflush(trace_file);
 	buffer_pos = 0;
 }
@@ -115,35 +113,17 @@ void trace_cleanup(void) {
 	}
 }
 
-// Captures trace_id, event and timestamp, then stores in buffer
+// Captures trace_id and event, then stores in buffer
 void trace_record(const Proto* p, uint8_t event) {
 	if (!trace_file) return;
 
 	uint16_t id = p->trace_id;
 	printf("trace: recording event %d for trace_id %d\n", event, id);
 
-	// Get timestamp
-	uint64_t timestamp;
-#ifdef _WIN32
-	FILETIME ft;
-	GetSystemTimeAsFileTime(&ft);
-	// Convert Windows FILETIME to nanoseconds since epoch
-	uint64_t winTime = ((uint64_t)ft.dwHighDateTime << 32) | ft.dwLowDateTime;
-	// Windows epoch is 1601-01-01, Unix epoch is 1970-01-01
-	// Difference is 11644473600 seconds
-	timestamp = (winTime - 116444736000000000ULL) * 100; // Convert to nanoseconds
-#else
-	struct timespec ts;
-	clock_gettime(CLOCK_REALTIME, &ts);
-	timestamp = (uint64_t)ts.tv_sec * 1000000000ULL + ts.tv_nsec;
-#endif
+	// Normalize event to 1-bit: call=0, return=1
+	uint8_t event_bit = (event == TRACE_EVENT_RETURN) ? 1 : 0;
 
-	// Write entry to buffer
-	TraceEntry entry;
-	entry.id = id;
-	entry.event = event;
-	memset(entry._pad, 0, sizeof(entry._pad));
-	entry.timestamp = timestamp;
+	TraceEntry entry = trace_pack(id, event_bit);
 	trace_buffer[buffer_pos++] = entry;
 
 	// If buffer is full, flush to file
@@ -156,5 +136,3 @@ void trace_record(const Proto* p, uint8_t event) {
 }
 
 } // end NS_SLUA
-
- 
