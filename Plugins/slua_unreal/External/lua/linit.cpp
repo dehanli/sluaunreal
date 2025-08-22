@@ -32,7 +32,7 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
-#include "trace.h"
+#include "ltrace.h"
 namespace NS_SLUA {
 
 /*

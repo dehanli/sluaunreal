@@ -26,7 +26,7 @@
 #include "ltm.h"
 #include "lundump.h"
 #include "lvm.h"
-#include "trace.h"
+#include "ltrace.h"
 
 namespace NS_SLUA {
 

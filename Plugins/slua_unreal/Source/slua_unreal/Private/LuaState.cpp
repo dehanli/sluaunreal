@@ -40,6 +40,7 @@
 #include "LuaProtobufWrap.h"
 #include "Stats/Stats.h"
 #include "luasocket/luasocket.h"
+#include "ltrace.h"
 
 namespace NS_SLUA {
     FLuaStateInitEvent LuaState::onInitEvent;
@@ -336,6 +337,7 @@ namespace NS_SLUA {
         }
         tickGC(dtime);
         tickLuaActors(dtime);
+        trace_flush_with_timestamp((uint64)(FPlatformTime::Seconds() * 1000000.0));
     }
 
     TStatId LuaState::GetStatId() const

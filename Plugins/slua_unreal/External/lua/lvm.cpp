@@ -29,7 +29,7 @@
 #include "ltable.h"
 #include "ltm.h"
 
-#include "trace.h" 
+#include "ltrace.h" 
 namespace NS_SLUA {
 
 /* Trace Lua closure return */

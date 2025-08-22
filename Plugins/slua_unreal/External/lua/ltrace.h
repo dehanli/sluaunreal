@@ -1,5 +1,5 @@
-#ifndef trace_h
-#define trace_h
+#ifndef ltrace_h
+#define ltrace_h
 
 #include <stdint.h>
 #include "lobject.h"
@@ -39,6 +39,8 @@ void symbol_cleanup(void);
 
 void trace_init(void);
 void trace_record(const Proto* p, uint8_t event);
+void trace_flush(void);
+void trace_flush_with_timestamp(uint64_t timestamp_us);
 void trace_cleanup(void);
 
 } // end NS_SLUA

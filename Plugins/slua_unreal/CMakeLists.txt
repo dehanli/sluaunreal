@@ -42,7 +42,7 @@ set(LUA_SRC_FILES
     ${LUA_SRC_PATH}/lutf8lib.cpp
     ${LUA_SRC_PATH}/lvm.cpp
     ${LUA_SRC_PATH}/lzio.cpp
-    ${LUA_SRC_PATH}/trace.cpp
+    ${LUA_SRC_PATH}/ltrace.cpp
 )
 
 set(THIRDPART_INC_PATH "")

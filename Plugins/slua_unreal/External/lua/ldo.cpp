@@ -30,7 +30,7 @@
 #include "lundump.h"
 #include "lvm.h"
 #include "lzio.h"
-#include "trace.h"
+#include "ltrace.h"
 
 #define errorstatus(s)	((s) > LUA_YIELD)
 /*
