@@ -29,17 +29,8 @@
 #include "ltable.h"
 #include "ltm.h"
 
-#include "ltrace.h" 
 namespace NS_SLUA {
 
-/* Trace Lua closure return */
-#define trace_LClosure_return() do { \
-	if (ttisLclosure(ci->func)) { \
-		LClosure *cl = clLvalue(ci->func); \
-		trace_record(cl->p, TRACE_EVENT_RETURN); \
-	} \
-} while (0)
- 
 /* limit for table tag-method chains (to avoid loops) */
 #define MAXTAGLOOP	2000
 

@@ -31,7 +31,7 @@ set(LUA_SRC_FILES
     ${LUA_SRC_PATH}/lobject.cpp
     ${LUA_SRC_PATH}/lopcodes.cpp
     ${LUA_SRC_PATH}/loslib.cpp
-    ${LUA_SRC_PATH}/lparser.cpp 
+    ${LUA_SRC_PATH}/lparser.cpp
     ${LUA_SRC_PATH}/lstate.cpp
     ${LUA_SRC_PATH}/lstring.cpp
     ${LUA_SRC_PATH}/lstrlib.cpp

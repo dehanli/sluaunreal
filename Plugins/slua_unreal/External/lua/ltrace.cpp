@@ -106,6 +106,7 @@ void symbol_record(const Proto* f) {
 			f->trace_id,
 			getstr(f->source),
 			f->linedefined);
+		fflush(symbol_file);
 	}
 	for (int i = 0; i < f->sizep; i++) {
 		symbol_record(f->p[i]);
