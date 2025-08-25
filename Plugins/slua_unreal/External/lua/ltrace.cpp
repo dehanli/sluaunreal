@@ -14,6 +14,9 @@
 #include "lobject.h"
 #include "lstring.h"
 
+// Lua trace runtime: writes per-frame headers and 2-byte entries to trace.bin.
+// Manages symbols.txt lifecycle. See README_ltrace.md for binary format.
+
 namespace NS_SLUA {
 
 static TraceEntry trace_buffer[TRACE_BUFFER_SIZE];
@@ -23,7 +26,7 @@ static FILE*      trace_file   = NULL;
 static int        symbol_atexit_registered = 0;
 static int        trace_atexit_registered = 0;
 
-// Track current frame (tick) header
+// Track current per-tick frame being written
 static int        frame_open = 0;
 static long       frame_header_pos = 0; // file offset where header starts
 static uint32_t   frame_id_counter = 0;
@@ -52,7 +55,7 @@ static uint64_t now_us(void) {
 #endif
 }
 
-// Begin a frame by writing a placeholder header; entries follow immediately
+// Lazily begin a frame: write placeholder header; entries follow immediately
 static void frame_begin_if_needed() {
 	if (frame_open || !trace_file) return;
 	frame_open = 1;
@@ -131,7 +134,7 @@ void trace_init(void) {
 	}
 }
 
-// Flushes buffer to file
+// Write buffered 2-byte entries to file
 void trace_flush(void) {
 	if (buffer_pos == 0 || !trace_file) return;
 	// Write contiguous 2-byte entries
@@ -142,7 +145,7 @@ void trace_flush(void) {
 	buffer_pos = 0;
 }
 
-// Public API: finalize current frame with timestamp and count, then flush entries
+// Public API: finalize current frame (backfill timestamp and frame_id), then flush entries
 void trace_flush_with_timestamp(uint64_t timestamp_us) {
 	if (!trace_file || !frame_open) return;
 	// Backfill timestamp and frame_id
@@ -158,7 +161,7 @@ void trace_flush_with_timestamp(uint64_t timestamp_us) {
 	current_frame_id = 0;
 }
 
-// Cleanup: flush and close 
+// Cleanup: flush any open frame and close file
 void trace_cleanup(void) {
 	if (trace_file) {
 		// Flush any open frame as a final frame
@@ -169,7 +172,7 @@ void trace_cleanup(void) {
 	}
 }
 
-// Captures trace_id and event, then stores in buffer
+// Capture trace_id + event, normalize to 1-bit (call=0, return=1), ensure a frame is open, then buffer
 void trace_record(const Proto* p, uint8_t event) {
 	if (!trace_file) return;
 

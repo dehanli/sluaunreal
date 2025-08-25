@@ -4,11 +4,15 @@
 #include <stdint.h>
 #include "lobject.h"
 
+// Lua trace: records Lua closure CALL/RETURN at the VM boundary and writes
+// 2-byte entries to trace.bin grouped by per-tick frame headers.
+// Also writes symbols.txt mapping trace_id -> source:linedefined.
+
 namespace NS_SLUA {
 
 #define TRACE_BUFFER_SIZE 4096
 
-// Event type for an entry: CALL or RETURN
+// Event identifiers from the Lua VM; output normalizes to 1-bit (call=0, return=1)
 typedef enum TraceEventType {
 	TRACE_EVENT_CALL = 1,
 	TRACE_EVENT_RETURN = 2
@@ -31,12 +35,13 @@ static inline TraceEntry trace_pack(uint16_t id, uint8_t event_bit) {
 	return e;
 }
 
-
-
+// Symbols API: write "trace_id,source:line" entries to symbols.txt
+// Call symbol_init() before recording; symbol_cleanup() closes the file.
 void symbol_record(const Proto* f);
 void symbol_init(const char* filename);
 void symbol_cleanup(void);
 
+// Trace API: capture events, manage per-tick frames, and write trace.bin
 void trace_init(void);
 void trace_record(const Proto* p, uint8_t event);
 void trace_flush(void);

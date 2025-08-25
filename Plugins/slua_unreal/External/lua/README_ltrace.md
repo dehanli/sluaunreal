@@ -30,7 +30,7 @@ Record Lua Closure calls/returns at the Lua VM boundary and write events to `tra
 ## Decoding binary
 1) Binary → text:
 ```bash
-python3 scripts/parse_trace_bin.py | tee trace.bin-decoded.txt
+python3 scripts/parse_trace_bin.py
 ```
 Outputs:
 - `FRAME id=<n> ts=<ISO8601>`
@@ -38,11 +38,11 @@ Outputs:
 
 2) Enrich with file:line + function names:
 ```bash
-python3 scripts/parse_trace_bin.py | python3 scripts/decode_trace.py | tee trace.bin-decoded-human.txt
+python3 scripts/parse_trace_bin.py | python3 scripts/decode_trace.py > decoded.txt
 ```
 - `decode_trace.py` loads `symbols.txt`, maps `trace_id` to `source:line`, and infers function names by scanning Lua files.
 
 ## Caveats
-- Calls like `Test.lua:update(dt)` invoked from C++ each frame may appear as repeated CALLs without matching RETURN if the return crosses the C/Lua boundary (RETURN not emitted by the Lua→C path). Intra‑Lua calls show paired CALL/RETURN.
+- Calls like `Test.lua:update(dt)` invoked from C++ each frame may appear as repeated CALLs without matching RETURN if the return crosses the C/Lua boundary (RETURN not emitted by the Lua->C path). Intra‑Lua calls show paired CALL/RETURN.
+- When decoding, make sure to run from the directory containing `trace.bin` and `symbols.txt`.
 - One `FRAME` header is produced per UE tick (on first event of the tick), then finalized and flushed at the end of `LuaState::Tick`.
-- When decoding, run from the directory containing `trace.bin` and `symbols.txt`.
