@@ -39,6 +39,7 @@
 #include "LuaProfiler.h"
 #include "LuaProtobufWrap.h"
 #include "Stats/Stats.h"
+#include "Misc/DateTime.h"
 #include "luasocket/luasocket.h"
 #include "ltrace.h"
 
@@ -337,7 +338,9 @@ namespace NS_SLUA {
         }
         tickGC(dtime);
         tickLuaActors(dtime);
-        trace_flush_with_timestamp((uint64)(FPlatformTime::Seconds() * 1000000.0));
+        const FDateTime NowUtc = FDateTime::UtcNow();
+        const FTimespan SinceEpoch = NowUtc - FDateTime(1970, 1, 1);
+        trace_flush_with_timestamp((uint64)SinceEpoch.GetTotalMicroseconds());
     }
 
     TStatId LuaState::GetStatId() const
