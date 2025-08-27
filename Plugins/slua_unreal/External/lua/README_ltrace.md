@@ -73,9 +73,9 @@ python3 scripts/parse_trace_bin.py | python3 scripts/decode_trace.py > decoded.t
 ### Lua Source
 - `lapi.cpp` - record symbol in `lua_load`
 - `ldo.cpp` - trace call and return here
-- `ldump.cpp` - DumpVar(f->trace_id, D);
-- `lundump.cpp` - LoadVar(S, f->trace_id);
-- `linit.cpp` - initialize symbol and trace logic TODO: could put elsewhere?
+- `ldump.cpp` - DumpVar(f->trace_id, D)
+- `lundump.cpp` - LoadVar(S, f->trace_id)
+- `linit.cpp` - initialize symbol and trace logic
 - `lparser.cpp` - trace_id assignment & increment (two modifications since there are two places Protos created)
 
 - `lobject.h` - add field to struct Proto 
@@ -97,3 +97,5 @@ python3 scripts/parse_trace_bin.py | python3 scripts/decode_trace.py > decoded.t
 - **CALL without RETURN**: Calls like `Test.lua:update(dt)` invoked from C++ each frame may appear as repeated CALLs without matching RETURN, if the return crosses the C/Lua boundary (RETURN not emitted by the Lua->C path). Function calls within Lua show paired CALL/RETURN.
 
 - **Explicit flush of table entry**: Entries are flushed immediately since I found in UE PIE Mode, `atexit` doesn't run when you stop PIE, without the explicit flush, some table entries are interrupted, leading to unknown symbols at runtime.
+
+- **Trace ID assignment at load time**: IDs are assigned when chunks are loaded so both source, precompiled bytecode, and runtime-generated chunks get unique `trace_id`s in the same run; compile-time-only IDs can’t cover dynamic chunks and may drift across builds.
